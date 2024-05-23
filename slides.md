@@ -26,9 +26,9 @@ Tom Lanser - 24 mei 2024
 
 ---
 
-<div class="flex justify-center">
-  <img src="https://www.terraform.io/assets/images/logo-hashicorp-3f122f422f4.svg" alt="Terraform" width="200" height="200">
-</div>
+# Onderwerpen
+
+<Toc />
 
 ---
 
@@ -55,50 +55,64 @@ Onderdelen van Terraform:
 -->
 
 ---
+level: 2
+---
 
 # Variable
 Variables kunnen worden gebruikt om waarden configureerbaar te maken.
 
-```hcl {*|10|*}
+````md magic-move
+```hcl
 variable "region" {
-  description = "The region where AWS resources will be created"
+  description = "DigitalOcean region"
   type        = string
-  default     = "eu-central-1"
+  default     = "ams3"
 }
 
-variable "secret_key" {
-  description = "The secret key for AWS"
+variable "do_token" {
+  description = "DigitalOcean API token"
   type        = string
+  nullable    = false
+}
+```
+```hcl
+variable "region" {
+  description = "DigitalOcean region"
+  type        = string
+  default     = "ams3"
+}
+
+variable "do_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  nullable    = false
   sensitive   = true
 }
 ```
 
+````
+
 ---
 layout: image-right
 image: https://cover.sli.dev?2
+level: 2
 ---
 
 # Provider
 
-Voorbeeld provider van AWS
+Voorbeeld provider van DigitalOcean
 
 Hierin defineer je vooral de specificaties van de cloud provider om ermee te kunnen praten en resources te beheren
 
 ````md magic-move
-```hcl {*|2-4|*}
-provider "aws" {
-  region = "eu-central-1"
-  access_key = "geheim123"
-  secret_key = "geheim123"
-  version = "~> 3.0"
+```hcl
+provider "digitalocean" {
+  token = "geheim123"
 }
 ```
 ```hcl
-provider "aws" {
-  region = var.region
-  access_key = var.access_key
-  secret_key = var.secret_key
-  version = "~> 3.0"
+provider "digitalocean" {
+  token = var.do_token
 }
 ```
 ````
@@ -109,31 +123,54 @@ provider "aws" {
 -->
 
 ---
-layout: image-right
-image: https://cover.sli.dev?3
+level: 2
 ---
 
 # Resource
 
-Hieronder een voorbeeld van hoe je een AWS EC2 instance kunt definiëren met Terraform:
+Hieronder een voorbeeld van hoe je DigitalOcean resources kunt definiëren met Terraform:
 
+````md magic-move
 ```hcl
-resource "aws_instance" "" {
-  ami           = "ami-12345"
-  instance_type = "t2.micro"
-  key_name      = "my-key-pair"
+resource "digitalocean_droplet" "presentation" {
+  image = "nginx"
+  name  = "presentatie"
+  size  = "s-1vcpu-1gb"
 
-  tags = {
-    Name        = "backend"
-    Environment = "development"
-  }
+  region = var.region
 }
 ```
+```hcl
+resource "digitalocean_domain" "presentatie_domain" {
+  name = "${var.subdomain}.${var.domain}"
+}
 
+resource "digitalocean_certificate" "presentatie_domain_certificate" {
+  type = "lets_encrypt"
+  name = "presentation-certificate"
+
+  domains = [digitalocean_domain.presentatie_domain.name]
+}
+```
+```hcl
+resource "cloudflare_record" "presentation_ns_record" {
+  for_each = toset(["ns1", "ns2", "ns3"])
+
+  zone_id = var.cf_zone
+  proxied = false
+
+  name  = var.subdomain
+  type  = "NS"
+  ttl   = 60
+  value = "${each.key}.digitalocean.com"
+}
+```
+````
 
 ---
 layout: image-right
 image: https://cover.sli.dev?4
+level: 2
 ---
 
 # State
@@ -148,11 +185,12 @@ terraform {
   backend "s3" {
     bucket = "my-terraform-state"
     key    = "path/to/my/key"
-    region = "eu-central-1"
   }
 }
 ```
 
+---
+level: 2
 ---
 
 # CLI
@@ -176,8 +214,8 @@ class: text-center
 
 ---
 layout: center
-class: text-center
 ---
 
 # Vragen?
 
+<RepositoryQR />

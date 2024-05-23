@@ -7,7 +7,7 @@ Dit project is een presentatie over de basisprincipes van Terraform, gericht op 
 Om de presentatie te starten:
 - `yarn install`
 - `yarn run dev`
-- ga naar http://localhost:3030
+- Ga naar http://localhost:3030
 
 De slides zijn te vinden in de slides.md file. 
 

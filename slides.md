@@ -201,7 +201,7 @@ De lifecylce van de cli:
 1. `terraform init` -> Dit initialiseert de terraform cli met de provider en de state.
 2. `terraform plan` -> Dit toont alle resources die worden gemaakt of gewijzigd.
 3. `terraform apply` -> Dit maakt de resources aan op basis van wat er verschild tussen de state en de configuratie.
-4. `terraform destroy` -> Dit verwijdert alle resources die worden gemaakt of gewijzigd.
+4. `terraform destroy` -> Dit verwijdert alle resources die er op dit moment zijn.
 
 ---
 layout: cover
